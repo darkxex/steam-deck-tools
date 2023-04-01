@@ -6,6 +6,7 @@
 
 ## 0.6.x
 
+- PowerControl: Show Game Profiles menu item
 - PowerControl: Improve handling of restoring DesktopProfile
 - SteamController/PowerControl: Create Logs in Documents/SteamDeckTools/Logs
 - SteamController: Improve **Steam Input** support for **Steam Version 1684535786** WARNING: only English is supported!
