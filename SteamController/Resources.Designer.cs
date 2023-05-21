@@ -71,6 +71,16 @@ namespace SteamController {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] chord_neptune_guide {
+            get {
+                object obj = ResourceManager.GetObject("chord_neptune_guide", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon controller_classic_custom {

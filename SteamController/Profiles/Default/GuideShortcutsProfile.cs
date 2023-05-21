@@ -46,10 +46,14 @@ namespace SteamController.Profiles.Default
                 switch (Settings.Default.KeyboardStyle)
                 {
                     case Settings.KeyboardStyles.CTRL_WIN_O:
+                        if (Settings.Default.EnableSteamKeyboard && Helpers.SteamConfiguration.IsRunning)
+                            break;
                         c.Keyboard.KeyPress(new VirtualKeyCode[] { VirtualKeyCode.LCONTROL, VirtualKeyCode.LWIN }, VirtualKeyCode.VK_O);
                         break;
 
                     case Settings.KeyboardStyles.WindowsTouch:
+                        if (Settings.Default.EnableSteamKeyboard && Helpers.SteamConfiguration.IsRunning)
+                            break;
                         if (!OnScreenKeyboard.Toggle())
                         {
                             // Fallback to CTRL+WIN+O

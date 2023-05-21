@@ -14,18 +14,30 @@ namespace SteamController.Managers
             { "controller_base/desktop_neptune.vdf", Resources.empty_neptune },
             { "controller_base/chord_neptune.vdf", Resources.chord_neptune }
         };
+        static readonly Dictionary<String, byte[]> lockedSteamControllerGuideFiles = new Dictionary<string, byte[]>
+        {
+            { "controller_base/desktop_neptune.vdf", Resources.empty_neptune },
+            { "controller_base/chord_neptune.vdf", Resources.chord_neptune_guide }
+        };
         static readonly Dictionary<String, byte[]> installedSteamControllerFiles = new Dictionary<string, byte[]>
         {
             { "controller_base/templates/controller_neptune_steamcontroller.vdf", Resources.empty_neptune },
         };
 
-        private bool? filesLocked;
+        private enum LockState
+        {
+            Disabled,
+            GuideLock,
+            FullLock
+        }
+
+        private LockState lockState = LockState.Disabled;
 
         public SteamConfigsManager()
         {
             // always unlock configs when changed
             Settings.Default.SettingChanging += UnlockControllerFiles;
-            SetSteamControllerFilesLock(false);
+            SetSteamControllerFilesLock(LockState.Disabled);
         }
 
         private bool IsActive
@@ -39,13 +51,13 @@ namespace SteamController.Managers
 
         public override void Dispose()
         {
-            SetSteamControllerFilesLock(false);
+            SetSteamControllerFilesLock(LockState.Disabled);
             Settings.Default.SettingChanging -= UnlockControllerFiles;
         }
 
         private void UnlockControllerFiles(string key)
         {
-            SetSteamControllerFilesLock(false);
+            SetSteamControllerFilesLock(LockState.Disabled);
         }
 
         public override void Tick(Context context)
@@ -53,33 +65,47 @@ namespace SteamController.Managers
             if (!IsActive)
                 return;
 
-            bool running = Helpers.SteamConfiguration.IsRunning;
-            if (running == filesLocked)
+            LockState currentState = LockState.Disabled;
+
+            if (Helpers.SteamConfiguration.IsRunning)
+                currentState = Settings.Default.EnableSteamKeyboard ? LockState.GuideLock : LockState.FullLock;
+
+            if (currentState == lockState)
                 return;
 
-            SetSteamControllerFilesLock(running);
+            SetSteamControllerFilesLock(currentState);
         }
 
-        private void SetSteamControllerFilesLock(bool lockConfigs)
+        private void SetSteamControllerFilesLock(LockState newState)
         {
             if (!IsActive)
                 return;
 
-            Log.TraceLine("SetSteamControllerFilesLock: {0}", lockConfigs);
+            Log.TraceLine("SetSteamControllerFilesLock: {0}", newState);
 
-            if (lockConfigs)
+            switch (newState)
             {
-                foreach (var config in lockedSteamControllerFiles)
-                    Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, true);
-                foreach (var config in installedSteamControllerFiles)
-                    Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, false);
+                case LockState.Disabled:
+                    foreach (var config in lockedSteamControllerFiles)
+                        Helpers.SteamConfiguration.ResetConfigFile(config.Key);
+                    break;
+
+                case LockState.GuideLock:
+                    foreach (var config in lockedSteamControllerGuideFiles)
+                        Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, true);
+                    foreach (var config in installedSteamControllerFiles)
+                        Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, false);
+                    break;
+
+                case LockState.FullLock:
+                    foreach (var config in lockedSteamControllerFiles)
+                        Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, true);
+                    foreach (var config in installedSteamControllerFiles)
+                        Helpers.SteamConfiguration.OverwriteConfigFile(config.Key, config.Value, false);
+                    break;
             }
-            else
-            {
-                foreach (var config in lockedSteamControllerFiles)
-                    Helpers.SteamConfiguration.ResetConfigFile(config.Key);
-            }
-            filesLocked = lockConfigs;
+
+            lockState = newState;
         }
     }
 }

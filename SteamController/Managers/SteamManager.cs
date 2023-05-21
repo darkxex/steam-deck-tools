@@ -18,8 +18,9 @@ namespace SteamController.Managers
             new Classifier() { Type = "controller_layout_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowText = "Controller Layout", MinVersion = 1684535786 }, // Controller Calibration
             new Classifier() { Type = "desktop_guide_layout_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowTextPrefix = "Steam Controller Configs -", MinVersion = 1684535786 }, // Desktop and Guide
             new Classifier() { Type = "game_layout_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowTextSuffix = "- Controller Layout", MinVersion = 1684535786 }, // for Game
-
+    
             // Support Steam client released around 2023-01-20, version: 1674182294
+            new Classifier() { Type = "keyboard_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowText = "Steam Input On-screen Keyboard", MinVersion = 1674182294 }, // for Game
             new Classifier() { Type = "gamepadui_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowText = "Steam", Forbid = true, MaxVersion = 1684535786-1 },
             new Classifier() { Type = "gamepadui_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowText = "Steam Settings", Forbid = true, MaxVersion = 1684535786-1 },
             new Classifier() { Type = "gamepadui_2023_05_21", ClassName = "SDL_app", ProcessName = "steamwebhelper", WindowText = "Special Offers", Forbid = true, MaxVersion = 1684535786-1 },
@@ -104,15 +105,14 @@ namespace SteamController.Managers
                 return "bigpicture";
             if (SteamConfiguration.IsRunningGame.GetValueOrDefault(false))
                 return "game";
-            return ClassifyForegroundProcess();
+            var result = ClassifyWindow(GetForegroundWindow());
+            if (result == null)
+                result = ClassifyWindow(FindWindow("SDL_App", "Steam Input On-screen Keyboard"));
+            return result;
         }
 
-        private string? ClassifyForegroundProcess()
+        private string? ClassifyWindow(IntPtr hWnd)
         {
-            IntPtr hWnd = GetForegroundWindow();
-            if (hWnd == IntPtr.Zero)
-                return null;
-
             StringBuilder classNameBuilder = new StringBuilder(256);
             if (GetClassName(hWnd, classNameBuilder, classNameBuilder.Capacity) == 0)
                 return null;

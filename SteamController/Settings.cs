@@ -20,6 +20,14 @@ namespace SteamController
             set { Set("EnableSteamDetection", value); }
         }
 
+        [Description("When STEAM+X is used prefer to use Steam Keyboard - requires: " +
+            "Steam Input, Steam Config Overwrite, and Keyboard Style to be set.")]
+        public bool EnableSteamKeyboard
+        {
+            get { return Get<bool>("EnableSteamKeyboard", false); }
+            set { Set("EnableSteamKeyboard", value); }
+        }
+
         [Description("Keep X360 controller connected always - it is strongly advised to disable this option. Might be required by some games that do not like disonnecting controller. Will disable beep notifications.")]
         public bool KeepX360AlwaysConnected
         {
