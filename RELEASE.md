@@ -6,6 +6,7 @@
 
 ## 0.6.x
 
+- PowerControl: Add `3 dots + L1 + R1` to reset current resolution
 - PowerControl: Allow to set Autostart Profile Settings
 - PowerControl: Show Game Profiles menu item
 - PowerControl: Improve handling of restoring DesktopProfile
