@@ -66,7 +66,7 @@ namespace SteamController.Profiles.Predefined
             if (TouchPadsEnabled && EmulateTouchPads)
             {
                 // Default emulation
-                EmulateScrollOnLPad(context);
+                //EmulateScrollOnLPad(context);
                 EmulateMouseOnRPad(context, false);
             }
             else
