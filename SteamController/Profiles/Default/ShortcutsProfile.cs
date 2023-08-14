@@ -1,3 +1,4 @@
+using System.Media;
 using WindowsInput;
 
 namespace SteamController.Profiles.Default
@@ -25,12 +26,19 @@ namespace SteamController.Profiles.Default
             if (c.Steam.BtnOptions.HoldOnce(HoldToSwitchProfile, ShortcutConsumed))
             {
                 if (!c.SelectNext())
-                    c.BackToDefault();
+                { c.BackToDefault();
+                  SystemSounds.Exclamation.Play();
+                }
+                else if (Settings.Default.KeepX360AlwaysConnected)
+                { SystemSounds.Hand.Play(); }
+
                 return Status.Done;
             }
             else if (c.Steam.BtnOptions.HoldChain(HoldToSwitchDesktop, ShortcutConsumed, "SwitchToDesktop"))
             {
                 c.BackToDefault();
+                if (Settings.Default.KeepX360AlwaysConnected)
+                { SystemSounds.Exclamation.Play(); }
                 return Status.Done;
             }
 
